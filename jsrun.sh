@@ -35,9 +35,10 @@ if [[ -n "$JSDOCDIR" ]]; then
         _APPDIR="$JSDOCDIR/app"
 	_BASEDIR="$JSDOCDIR"
 else
-        _DOCDIR=""
-        _APPDIR="./app"
-	_BASEDIR="."
+        JSDOCDIR=`dirname $0`
+        _DOCDIR="-Djsdoc.dir=$JSDOCDIR"
+        _APPDIR="$JSDOCDIR/app"
+	_BASEDIR="$JSDOCDIR"
 fi
 
 if [[ -n "$JSDOCTEMPLATEDIR" ]]; then
