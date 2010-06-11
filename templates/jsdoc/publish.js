@@ -25,13 +25,14 @@ function publish(symbolSet) {
 	try {
 		var classTemplate = new JSDOC.JsPlate(publish.conf.templatesDir+"class.tmpl");
 		var classesTemplate = new JSDOC.JsPlate(publish.conf.templatesDir+"allclasses.tmpl");
+		var categoriesTemplate = new JSDOC.JsPlate(publish.conf.templatesDir+"allcategories.tmpl");
 	}
 	catch(e) {
 		print("Couldn't create the required templates: "+e);
 		quit();
 	}
 	
-	// some ustility filters
+	// some utility filters
 	function hasNoParent($) {return ($.memberOf == "")}
 	function isaFile($) {return ($.is("FILE"))}
 	function isaClass($) {return ($.is("CONSTRUCTOR") || $.isNamespace)}
@@ -66,10 +67,18 @@ function publish(symbolSet) {
 		}
 	}
 	
+ 	var categories = symbolSet.categories;
+
 	// create a class index, displayed in the left-hand column of every class page
+	function makeLeftIndex() {
+	    publish.classesIndex = classesTemplate.process(classes); // kept in memory
+	    publish.categoriesIndex = categoriesTemplate.process(categories); // kept in memory
+	    publish.leftIndex = publish.classesIndex + "\n" + publish.categoriesIndex;
+	    return publish.leftIndex;
+	}
 	Link.base = "../";
- 	publish.classesIndex = classesTemplate.process(classes); // kept in memory
-	
+	makeLeftIndex();
+
 	// create each of the class pages
 	for (var i = 0, l = classes.length; i < l; i++) {
 		var symbol = classes[i];
@@ -84,9 +93,23 @@ function publish(symbolSet) {
 		IO.saveFile(publish.conf.outDir+"symbols/", ((JSDOC.opt.u)? Link.filemap[symbol.alias] : symbol.alias) + publish.conf.ext, output);
 	}
 	
+	// create each of the category pages
+	for (var i = 0, l = categories.length; i < l; i++) {
+		var symbol = categories[i];
+		
+		symbol.events = symbol.getEvents();   // 1 order matters
+		symbol.methods = symbol.getMethods(); // 2
+		
+		Link.currentSymbol= symbol;
+		var output = "";
+		output = classTemplate.process(symbol);
+		
+		IO.saveFile(publish.conf.outDir+"symbols/", ((JSDOC.opt.u)? Link.filemap[symbol.alias] : symbol.alias) + publish.conf.ext, output);
+	}
+	
 	// regenerate the index with different relative links, used in the index pages
 	Link.base = "";
-	publish.classesIndex = classesTemplate.process(classes);
+	makeLeftIndex();
 	
 	// create the class index page
 	try {
@@ -198,4 +221,24 @@ function resolveLinks(str, from) {
 	);
 	
 	return str;
+}
+
+/** removes the duplicate strings from an array */
+function removeDuplicateStrings(arr) {
+    var o = {};
+    arr.map(function(x) { o[x] = true; });
+    var a = [];
+    for (var key in o) {
+	a.push(key);
+    }
+    return a;
+}
+
+/** Joins the given arrays into one array. */
+function appendArrays(arrays) {
+    var out = [];
+    for (var i=0; i < arrays.length; i++) {
+	out = out.concat(arrays[i]);
+    }
+    return out;
 }

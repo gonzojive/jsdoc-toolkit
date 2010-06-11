@@ -21,7 +21,7 @@
 <!-- ============================== classes index ============================ -->
 		<div id="index">
 			<!-- begin publish.classesIndex -->
-			{+publish.classesIndex+}
+			{+publish.leftIndex+}
 			<!-- end publish.classesIndex -->
 		</div>
 		
@@ -34,8 +34,11 @@
 					if (data.isBuiltin()) {
 						classType += "Built-In ";
 					}
-					
-					if (data.isNamespace) {
+
+				        if (data.isCategory) {
+				                classType += "Category ";
+				        }
+					else if (data.isNamespace) {
 						if (data.is('FUNCTION')) {
 							classType += "Function ";
 						}

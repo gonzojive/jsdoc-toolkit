@@ -54,6 +54,10 @@ JSDOC.SymbolSet.prototype.relate = function() {
 	this.resolveBorrows();
 	this.resolveMemberOf();
 	this.resolveAugments();
+	if (JSDOC.PluginManager) {
+	    JSDOC.PluginManager.run("onFinishRelate", this);
+	}
+
 }
 
 JSDOC.SymbolSet.prototype.resolveBorrows = function() {
