@@ -10,6 +10,15 @@
 	    arr = categoryMap[cat] = [];
 	arr.push(sym);
     }
+
+    JSDOC.Symbol.prototype.memberp = function(otherSym) {
+	return this.categoryNames.indexOf(otherSym.alias) !== -1 || otherSym.alias == this.memberOf;
+    }
+
+    JSDOC.Symbol.prototype.classlikep = function() {
+	return this.is("CONSTRUCTOR") || this.isNamespace || this.isCategory;
+    }
+
     JSDOC.PluginManager.registerPlugin
 	("JSDOC.categoriesPlugin",
 	 {
@@ -41,27 +50,17 @@
     function resolveCategories(symbolSet) {
 	var symbols = symbolSet.toArray();
 
-	var categoryNames = removeDuplicateStrings(appendArrays(symbols.map(function(sym) { return sym.categoryNames; })));
-
-	function identity(x) { return x; };
-	var categorySymbols = categoryNames.map(function (catName) { 
-		return symbolSet.getSymbol(catName);
-	    }).filter(identity);
-	
 	symbols.map(function(sym) { 
 		sym.categoryNames.map(function (catName) {
-			var cat = symbolSet.getSymbol(catName);
-			
+			var container = symbolSet.getSymbol(catName);
+			if (container) {
+			    container.addMember(sym);
+			    container.isCategory = true;
+			}
 		    });
 	    });
 
-	categorySymbols.map(function(cat) { cat.isCategory = true; });
-
-	LOG.warn("Category names: " + categoryNames.length + " // Symbols " + categorySymbols + 
-		 " -- " + appendArrays(symbols.map(function(sym) { return sym.categoryNames; })).toSource());
-	LOG.warn("Finding a symbol: `" + categorySymbols + "'");
-
-	return categorySymbols;
+	return symbols.filter(function(sym) { return sym.isCategory; });
     }
     
     /** removes the duplicate strings from an array */

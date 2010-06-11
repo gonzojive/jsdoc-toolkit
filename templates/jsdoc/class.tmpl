@@ -103,7 +103,7 @@
 
 <!-- ============================== properties summary ===================== -->
 			<if test="data.properties.length">
-				{! var ownProperties = data.properties.filter(function($){return $.memberOf == data.alias && !$.isNamespace}).sort(makeSortby("name")); !}
+				{! var ownProperties = data.properties.filter(function($){return $.memberp(data) && !$.isNamespace && !$.isCategory}).sort(makeSortby("name")); !}
 				<if test="ownProperties.length">
 				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class {+data.alias+}.">
 					<caption>Field Summary</caption>
@@ -165,7 +165,8 @@
 
 <!-- ============================== methods summary ======================== -->
 			<if test="data.methods.length">
-				{! var ownMethods = data.methods.filter(function($){return $.memberOf == data.alias  && !$.isNamespace}).sort(makeSortby("name")); !}
+				{! var ownMethods = data.methods.filter(function($){return $.memberp(data)  && !$.isNamespace}).sort(makeSortby("name")); !}
+				{! ownMethods = data.methods.sort(makeSortby("name")); !}
 				<if test="ownMethods.length">
 				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class {+data.alias+}.">
 					<caption>Method Summary</caption>
@@ -224,7 +225,7 @@
 			</if>
 <!-- ============================== events summary ======================== -->
 			<if test="data.events.length">
-				{! var ownEvents = data.events.filter(function($){return $.memberOf == data.alias  && !$.isNamespace}).sort(makeSortby("name")); !}
+				{! var ownEvents = data.events.filter(function($){return $.memberp(data)  && !$.isNamespace}).sort(makeSortby("name")); !}
 				<if test="ownEvents.length">
 				<table class="summaryTable" cellspacing="0" summary="A summary of the events documented in the class {+data.alias+}.">
 					<caption>Event Summary</caption>
@@ -369,6 +370,14 @@
 						</for>
 						</dl>
 					</if>
+					<if test="data.categoryNames.length">
+						<dl class="detailList">
+						<dt class="heading">Categories:</dt>
+						<for each="item" in="data.categoryNames">
+							<dd>{+ new Link().toSymbol(item) +}</dd>
+						</for>
+						</dl>
+					</if>
 
 			</div>
 			</if>
@@ -425,6 +434,14 @@
 							<dt class="heading">See:</dt>
 							<for each="item" in="member.see">
 							<dd>{+ new Link().toSymbol(item) +}</dd>
+							</for>
+							</dl>
+						</if>
+						<if test="member.categoryNames.length">
+							<dl class="detailList">
+							<dt class="heading">Categories:</dt>
+							<for each="item" in="member.categoryNames">
+								<dd>{+ new Link().toSymbol(item) +}</dd>
 							</for>
 							</dl>
 						</if>
@@ -535,6 +552,14 @@
 							</for>
 							</dl>
 						</if>
+						<if test="member.categoryNames.length">
+							<dl class="detailList">
+							<dt class="heading">Categories:</dt>
+							<for each="item" in="member.categoryNames">
+								<dd>{+ new Link().toSymbol(item) +}</dd>
+							</for>
+							</dl>
+						</if>
 
 					<if test="!$member_last"><hr /></if>
 				</for>
@@ -630,6 +655,14 @@
 							<dl class="detailList">
 							<dt class="heading">See:</dt>
 							<for each="item" in="member.see">
+								<dd>{+ new Link().toSymbol(item) +}</dd>
+							</for>
+							</dl>
+						</if>
+						<if test="member.categoryNames.length">
+							<dl class="detailList">
+							<dt class="heading">Categories:</dt>
+							<for each="item" in="member.categoryNames">
 								<dd>{+ new Link().toSymbol(item) +}</dd>
 							</for>
 							</dl>

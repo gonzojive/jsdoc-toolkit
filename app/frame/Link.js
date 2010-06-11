@@ -122,7 +122,7 @@ Link.prototype._makeSymbolLink = function(alias) {
 	
 	// it's a symbol in another file
 	else {
-		if (!linkTo.is("CONSTRUCTOR") && !linkTo.isNamespace) { // it's a method or property
+   	        if (!linkTo.classlikep()) { // it's a method or property
 			linkPath= (Link.filemap) ? Link.filemap[linkTo.memberOf] :
 				      escape(linkTo.memberOf) || "_global_";
 			if (linkTo.isEvent)
